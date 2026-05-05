@@ -1,73 +1,63 @@
+const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds]
+});
+
+// IDs dos canais
+const canalTermos = '1501135306366255134';
+const canalDicas = '1501135727642153092';
+
 client.once('ready', async () => {
-  console.log(`Bot online: ${client.user.tag}`);
+  console.log(`✅ Bot online como ${client.user.tag}`);
 
-  const { EmbedBuilder } = require('discord.js');
+  // ===== MENSAGEM TERMOS =====
+  const canal1 = await client.channels.fetch(canalTermos);
 
-  // =====================
-  // 📜 CANAL TERMOS
-  // =====================
-  const canalTermos = client.channels.cache.get('1501135306366255134');
-
-  if (canalTermos) {
-    const mensagens = await canalTermos.messages.fetch({ limit: 10 });
-    const jaExiste = mensagens.find(msg => msg.author.id === client.user.id);
-
-    if (!jaExiste) {
-      const embedTermos = new EmbedBuilder()
-        .setTitle('📜 TERMOS')
-        .setDescription(`
+  if (canal1) {
+    const embedTermos = new EmbedBuilder()
+      .setTitle('📚 TERMOS')
+      .setDescription(`
 **Proibido**
-Solicitar reembolso após uso do serviço/produto.
+Solicitar reembolso após uso do serviço/produto, exceto em caso de erro confirmado pela equipe.
 
 **Compras e Trocas**
 • Não realizamos reembolso após pagamento confirmado.
-• Trocas aceitas até 10 minutos após entrega.
-• Solicitações exigem gravação da tela.
+• Trocas aceitas até 10 minutos após entrega, com justificativa válida.
+• Solicitações de troca exigem gravação completa da tela no momento da compra.
 • Erros por uso incorreto são responsabilidade do cliente.
 
 **Informações Importantes**
-• Aguarde confirmação da equipe.
-• Não garantimos aprovação ou VBV.
-• VPNs podem causar instabilidade.
-• Prefira conexões seguras (4G ou 5G).
-        `)
-        .setColor('Red');
+• Aguardar confirmação da equipe antes de solicitar troca.
+• Não garantimos aprovação ou VBV (verificação bancária).
+• VPNs ou Proxies podem causar instabilidade.
+• Prefira conexões seguras (4G/5G).
+      `)
+      .setColor('Red');
 
-      await canalTermos.send({ embeds: [embedTermos] });
-    }
+    canal1.send({ embeds: [embedTermos] });
   }
 
-  // =====================
-  // 🔎 CANAL DICAS
-  // =====================
-  const canalDicas = client.channels.cache.get('1501135727642153092');
+  // ===== MENSAGEM DICAS =====
+  const canal2 = await client.channels.fetch(canalDicas);
 
-  if (canalDicas) {
-    const mensagens = await canalDicas.messages.fetch({ limit: 10 });
-    const jaExiste = mensagens.find(msg => msg.author.id === client.user.id);
-
-    if (!jaExiste) {
-      const embedDicas = new EmbedBuilder()
-        .setTitle('🔎 Dicas')
-        .setDescription(`
-4G pode influenciar em um IP LIMPO e seguro!
+  if (canal2) {
+    const embedDicas = new EmbedBuilder()
+      .setTitle('🔎 Dicas')
+      .setDescription(`
+4G pode influenciar em um IP limpo e seguro!
 Login bom/conta já usada antes!
 
 Caso não tenha login bom, adquira ou crie com dados consistentes.
 
-━━━━━━━━━━━━━━
+*Evite usar o mesmo cartão em vários lugares ao mesmo tempo, pode causar cancelamento.*
 
-• Evite usar o cartão várias vezes antes da aprovação
-• Usar em muitos lugares pode causar cancelamento
+> Use material de qualidade para melhores resultados.
+      `)
+      .setColor('Blue');
 
-━━━━━━━━━━━━━━
-
-*Pegue sempre material de qualidade aqui no servidor!*
-        `)
-        .setColor('Red');
-
-      await canalDicas.send({ embeds: [embedDicas] });
-    }
+    canal2.send({ embeds: [embedDicas] });
   }
-
 });
+
+client.login(process.env.TOKEN);
