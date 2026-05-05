@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 
-// 👇 servidor pro Render
+// servidor pro Render
 app.get("/", (req, res) => {
   res.send("Bot rodando!");
 });
@@ -13,50 +13,46 @@ app.listen(process.env.PORT || 3000, () => {
 const {
   Client,
   GatewayIntentBits,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle
+  EmbedBuilder
 } = require('discord.js');
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds]
 });
 
-client.once('ready', () => {
+client.once('ready', async () => {
   console.log(`Bot online: ${client.user.tag}`);
-});
 
-client.on('interactionCreate', async (interaction) => {
+  const canal = client.channels.cache.find(c => c.name === 'termos');
 
-  if (interaction.isChatInputCommand()) {
-    if (interaction.commandName === 'comprar') {
+  if (!canal) return;
 
-      const botao = new ActionRowBuilder().addComponents(
-        new ButtonBuilder()
-          .setCustomId('comprar_btn')
-          .setLabel('🛒 Comprar')
-          .setStyle(ButtonStyle.Success)
-      );
+  const mensagens = await canal.messages.fetch({ limit: 10 });
+  const jaExiste = mensagens.find(msg => msg.author.id === client.user.id);
 
-      await interaction.reply({
-        content: "Clique no botão para comprar:",
-        components: [botao]
-      });
-    }
-  }
+  if (jaExiste) return;
 
-  if (interaction.isButton()) {
-    if (interaction.customId === 'comprar_btn') {
+  const embed = new EmbedBuilder()
+    .setTitle('📜 TERMOS')
+    .setDescription(`
+**Proibido**
+Solicitar reembolso após uso do serviço/produto.
 
-      await interaction.reply("🛒 Pedido criado! Aguardando pagamento...");
+**Compras e Trocas**
+• Não realizamos reembolso após pagamento confirmado.
+• Trocas aceitas até 10 minutos após entrega.
+• Solicitações exigem gravação da tela.
+• Erros por uso incorreto são responsabilidade do cliente.
 
-      setTimeout(async () => {
-        await interaction.followUp("✅ Pagamento aprovado!");
-        await interaction.followUp("📦 Produto: TESTE-123");
-      }, 5000);
-    }
-  }
+**Informações Importantes**
+• Aguarde confirmação da equipe.
+• Não garantimos aprovação ou VBV.
+• VPNs podem causar instabilidade.
+• Prefira conexões seguras (4G ou 5G).
+    `)
+    .setColor('Red');
 
+  canal.send({ embeds: [embed] });
 });
 
 client.login(process.env.TOKEN);
