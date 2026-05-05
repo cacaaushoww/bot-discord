@@ -23,7 +23,7 @@ const client = new Client({
 client.once('ready', async () => {
   console.log(`Bot online: ${client.user.tag}`);
 
-  const canal = client.channels.cache.find(c => c.name === 'termos');
+  const canal = client.channels.cache.get('1501135306366255134');
 
   if (!canal) return;
 
